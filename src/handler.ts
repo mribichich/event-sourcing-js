@@ -1,4 +1,4 @@
-import * as session from "./session";
+import * as session from "./es/session";
 import {
   createTimeClock,
   setEmployee,

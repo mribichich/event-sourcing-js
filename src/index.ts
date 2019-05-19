@@ -7,7 +7,7 @@ import { createTimeClockHandler, setEmployeeHandler } from "./handler";
 //   timeClockAggregate,
 //   loadFromHistory
 // } from "./timeClock";
-import * as session from "./session";
+import * as session from "./es/session";
 import { timeClockAggregate } from "./timeClock";
 
 // const trackedAggregates: any = [];

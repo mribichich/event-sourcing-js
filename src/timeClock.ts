@@ -1,4 +1,4 @@
-import aggregate, { Aggregate } from "./aggregate";
+import aggregate, { Aggregate } from "./es/aggregate";
 
 type TimeClock = {
   id: string;
