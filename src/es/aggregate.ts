@@ -1,36 +1,36 @@
-export type Aggregate<T> = {
+import { Event } from "./event";
+
+export type Aggregate<T, E = Event> = {
   getUncommittedChanges(): any;
-  applyChange<K>(event: {
+  applyChange(event: {
     type: string;
     entityType: string;
     aggregateId: string;
-    payload: K;
-  }): Aggregate<T>;
-  loadFromHistory(events: any[]): Aggregate<T>;
+    payload: Event["payload"];
+  }): Aggregate<T, E>;
+  loadFromHistory(events: any[]): Aggregate<T, E>;
 } & { [P in keyof T]: T[P] };
 
-export default function aggregate<T>(
-  reducer: (t: Aggregate<T>, event) => Aggregate<T>
-): Aggregate<T> {
+export default function aggregate<T, E extends Event>(
+  reducer: (t: Aggregate<T, E>, event: E) => Aggregate<T, E>
+): Aggregate<T, E> {
   const uncommittedEvents: any = [];
 
-  function applyChange<K>(eventData: {
+  function applyChange(eventData: {
     type: string;
     entityType: string;
     aggregateId: string;
-    payload: K;
+    payload: E["payload"];
   }) {
     const event = {
       ...eventData,
-      id: Math.random(),
+      id: Math.random().toString(),
       timestamp: new Date(),
-      version: this.version ? this.version + 1 : 1
+      version: this.version ? (this.version as number) + 1 : 1
     };
     uncommittedEvents.push(event);
 
-    // console.log("applyChange event: ", event);
-
-    return reducer(this, event);
+    return reducer(this, event as E);
   }
 
   function getUncommittedChanges() {
@@ -38,12 +38,15 @@ export default function aggregate<T>(
   }
 
   function loadFromHistory(events: any[]) {
-    return events.reduce<Aggregate<T>>((acc, cur) => reducer(acc, cur), this);
+    return events.reduce<Aggregate<T, E>>(
+      (acc, cur) => reducer(acc, cur),
+      this
+    );
   }
 
   return {
     getUncommittedChanges,
     applyChange,
     loadFromHistory
-  } as Aggregate<T>;
+  } as Aggregate<T, E>;
 }

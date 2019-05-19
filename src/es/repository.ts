@@ -3,10 +3,10 @@ import * as eventStore from "./eventStore";
 import { Event } from "./event";
 import { isEmpty } from "ramda";
 
-export function get<T>(
-  aggregate: () => Aggregate<T>,
+export function get<T, E extends Event>(
+  aggregate: () => Aggregate<T, E>,
   aggregateId: string
-): Aggregate<T> | undefined {
+): Aggregate<T, E> | undefined {
   var events = eventStore.get(aggregateId, -1);
 
   if (isEmpty(events)) {

@@ -1,11 +1,11 @@
-export type Event<T extends object> = {
+export type Event<T = object> = {
   id: string;
   version: number;
   timestamp: Date;
-  userId: string;
+  userId?: string;
   entityType: string;
   type: string;
   aggregateId: string;
 
-  paylod: T;
+  payload: T;
 };

@@ -3,7 +3,8 @@ import {
   createTimeClock,
   setEmployee,
   timeClockAggregate,
-  TimeClockAggregate
+  TimeClockAggregate,
+  TimeClockEvents
 } from "./timeClock";
 
 export function createTimeClockHandler(cmd) {
@@ -17,7 +18,7 @@ export function createTimeClockHandler(cmd) {
 }
 
 export function setEmployeeHandler(cmd) {
-  const aggr = session.get<TimeClockAggregate>(
+  const aggr = session.get<TimeClockAggregate, TimeClockEvents>(
     timeClockAggregate,
     cmd.payload.id
   );

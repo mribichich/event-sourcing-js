@@ -1,4 +1,8 @@
 import aggregate, { Aggregate } from "./es/aggregate";
+import { Event } from "./es/event";
+
+const ENTITY_TYPE = "TIMECLOCK";
+type ENTITY_TYPE = "TIMECLOCK";
 
 type TimeClock = {
   id: string;
@@ -6,9 +10,30 @@ type TimeClock = {
   employeeId?: string;
 };
 
-export type TimeClockAggregate = Aggregate<TimeClock>;
+export type TimeClockEvent<T> = Event<T> & {
+  entityType: ENTITY_TYPE;
+};
 
-function reducer(entity: TimeClockAggregate, event): TimeClockAggregate {
+export type TimeClockCreatedEvent = TimeClockEvent<{ dateTime: Date }> & {
+  type: "TIMECLOCK_CREATED";
+};
+
+export type EmployeeSetToTimeClockEvent = TimeClockEvent<{
+  employeeId: string;
+}> & {
+  type: "EMPLOYEE_SET_TO_TIMECLOCK";
+};
+
+export type TimeClockEvents =
+  | TimeClockCreatedEvent
+  | EmployeeSetToTimeClockEvent;
+
+export type TimeClockAggregate = Aggregate<TimeClock, TimeClockEvents>;
+
+function reducer(
+  entity: TimeClockAggregate,
+  event: TimeClockEvents
+): TimeClockAggregate {
   switch (event.type) {
     case "TIMECLOCK_CREATED":
       const x = Object.assign({}, entity, {
@@ -17,9 +42,6 @@ function reducer(entity: TimeClockAggregate, event): TimeClockAggregate {
         version: event.version
       });
       return x;
-
-    case "SET_NAME_TIMECLOCK":
-      return Object.assign({}, entity, { name: event.name });
 
     case "EMPLOYEE_SET_TO_TIMECLOCK":
       return Object.assign({}, entity, {
@@ -34,23 +56,23 @@ function reducer(entity: TimeClockAggregate, event): TimeClockAggregate {
 
 export const timeClockAggregate = () => aggregate(reducer);
 
-export function loadFromHistory(events: any[]) {
+export function loadFromHistory(events: TimeClockEvents[]) {
   return events.reduce<TimeClockAggregate>(
     (acc, cur) => reducer(acc, cur),
-    timeClockAggregate() as any
+    timeClockAggregate()
   );
 }
 
 export function createTimeClock(
   id: string,
-  //    userId:string,
+  // userId: string,
   dateTime: Date
 ): TimeClockAggregate {
   const aggr = timeClockAggregate();
 
   return aggr.applyChange({
     type: "TIMECLOCK_CREATED",
-    entityType: "TIMECLOCK",
+    entityType: ENTITY_TYPE,
     aggregateId: id,
     payload: { dateTime }
   });
@@ -59,7 +81,7 @@ export function createTimeClock(
 export function setEmployee(entity: TimeClockAggregate, employeeId: string) {
   return entity.applyChange({
     type: "EMPLOYEE_SET_TO_TIMECLOCK",
-    entityType: "TIMECLOCK",
+    entityType: ENTITY_TYPE,
     aggregateId: entity.id,
     payload: { employeeId }
   });
