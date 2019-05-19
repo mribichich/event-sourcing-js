@@ -1,0 +1,14 @@
+{
+  "name": "event-sourcing",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/ramda": "^0.26.8",
+    "ts-node": "^8.1.0",
+    "typescript": "^3.5.0-rc"
+  },
+  "dependencies": {
+    "ramda": "^0.26.1"
+  }
+}
