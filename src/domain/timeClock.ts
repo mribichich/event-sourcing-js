@@ -1,8 +1,8 @@
-import aggregate, { Aggregate } from "./es/aggregate";
-import { Event } from "./es/event";
+import aggregate, { Aggregate } from '../es/aggregate';
+import { Event } from '../es/event';
 
-const ENTITY_TYPE = "TIMECLOCK";
-type ENTITY_TYPE = "TIMECLOCK";
+const ENTITY_TYPE = 'TIMECLOCK';
+type ENTITY_TYPE = 'TIMECLOCK';
 
 type TimeClock = {
   id: string;
@@ -15,13 +15,13 @@ export type TimeClockEvent<T> = Event<T> & {
 };
 
 export type TimeClockCreatedEvent = TimeClockEvent<{ dateTime: Date }> & {
-  type: "TIMECLOCK_CREATED";
+  type: 'TIMECLOCK_CREATED';
 };
 
 export type EmployeeSetToTimeClockEvent = TimeClockEvent<{
   employeeId: string;
 }> & {
-  type: "EMPLOYEE_SET_TO_TIMECLOCK";
+  type: 'EMPLOYEE_SET_TO_TIMECLOCK';
 };
 
 export type TimeClockEvents =
@@ -35,22 +35,22 @@ function reducer(
   event: TimeClockEvents
 ): TimeClockAggregate {
   switch (event.type) {
-    case "TIMECLOCK_CREATED":
+    case 'TIMECLOCK_CREATED':
       const x = Object.assign({}, entity, {
         id: event.aggregateId,
         dateTime: event.payload.dateTime,
-        version: event.version
+        version: event.version,
       });
       return x;
 
-    case "EMPLOYEE_SET_TO_TIMECLOCK":
+    case 'EMPLOYEE_SET_TO_TIMECLOCK':
       return Object.assign({}, entity, {
         employeeId: event.payload.employeeId,
-        version: event.version
+        version: event.version,
       });
 
     default:
-      throw "unknown event type";
+      throw 'unknown event type';
   }
 }
 
@@ -71,18 +71,18 @@ export function createTimeClock(
   const aggr = timeClockAggregate();
 
   return aggr.applyChange({
-    type: "TIMECLOCK_CREATED",
+    type: 'TIMECLOCK_CREATED',
     entityType: ENTITY_TYPE,
     aggregateId: id,
-    payload: { dateTime }
+    payload: { dateTime },
   });
 }
 
 export function setEmployee(entity: TimeClockAggregate, employeeId: string) {
   return entity.applyChange({
-    type: "EMPLOYEE_SET_TO_TIMECLOCK",
+    type: 'EMPLOYEE_SET_TO_TIMECLOCK',
     entityType: ENTITY_TYPE,
     aggregateId: entity.id,
-    payload: { employeeId }
+    payload: { employeeId },
   });
 }

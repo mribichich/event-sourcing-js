@@ -1,11 +1,11 @@
-import * as session from "./es/session";
+import * as session from '../../es/session';
 import {
   createTimeClock,
   setEmployee,
   timeClockAggregate,
   TimeClockAggregate,
-  TimeClockEvents
-} from "./timeClock";
+  TimeClockEvents,
+} from '../../domain/timeClock';
 
 export function createTimeClockHandler(cmd) {
   session.add(
@@ -24,7 +24,7 @@ export function setEmployeeHandler(cmd) {
   );
 
   if (!aggr) {
-    throw new Error("aggr not found");
+    throw new Error('aggr not found');
   }
 
   session.add(setEmployee(aggr, cmd.payload.employeeId));
